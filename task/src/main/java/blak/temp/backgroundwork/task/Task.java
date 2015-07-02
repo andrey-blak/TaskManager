@@ -1,6 +1,6 @@
 package blak.temp.backgroundwork.task;
 
-import blak.temp.backgroundwork.TaskApplication;
+import blak.temp.backgroundwork.TaskApp;
 
 public abstract class Task<R, K, P> implements Runnable {
     private boolean mCancelled;
@@ -25,7 +25,7 @@ public abstract class Task<R, K, P> implements Runnable {
     }
 
     private TaskManager getTaskManager() {
-        return TaskApplication.getTaskManager();
+        return TaskApp.getTaskManager();
     }
 
     public abstract K getKey();

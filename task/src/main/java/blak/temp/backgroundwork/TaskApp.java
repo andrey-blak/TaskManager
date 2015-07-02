@@ -4,8 +4,8 @@ import blak.temp.backgroundwork.task.TaskManager;
 
 import android.app.Application;
 
-public class TaskApplication extends Application {
-    private static TaskApplication sInstance;
+public class TaskApp extends Application {
+    private static TaskApp sInstance;
 
     private TaskManager<String> mTaskManager = new TaskManager<String>();
 
@@ -20,7 +20,7 @@ public class TaskApplication extends Application {
     private void init() {
     }
 
-    public static TaskApplication getInstance() {
+    public static TaskApp getInstance() {
         return sInstance;
     }
 

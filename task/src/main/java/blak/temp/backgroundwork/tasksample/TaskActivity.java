@@ -1,7 +1,7 @@
 package blak.temp.backgroundwork.tasksample;
 
 import blak.temp.backgroundwork.R;
-import blak.temp.backgroundwork.TaskApplication;
+import blak.temp.backgroundwork.TaskApp;
 import blak.temp.backgroundwork.task.Task;
 import blak.temp.backgroundwork.task.TaskListener;
 import butterknife.ButterKnife;
@@ -36,7 +36,7 @@ public class TaskActivity extends FragmentActivity {
         super.onStart();
 
         String key = CounterTask.class.getCanonicalName();
-        TaskApplication.getTaskManager().addListener(key, mListener);
+        TaskApp.getTaskManager().addListener(key, mListener);
     }
 
     public void initListeners() {
@@ -51,7 +51,7 @@ public class TaskActivity extends FragmentActivity {
     private void startTask() {
         CounterTask task = new CounterTask();
 
-        TaskApplication.getTaskManager().execute(task, null);
+        TaskApp.getTaskManager().execute(task, null);
     }
 
     private TaskListener<Integer, String, Integer> mListener = new TaskListener<Integer, String, Integer>() {
