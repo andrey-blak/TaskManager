@@ -20,7 +20,10 @@ public class TaskActivity extends FragmentActivity {
     TextView mResultTextView;
 
     @InjectView(R.id.bw__counter_start_btn)
-    View mStartBtn;
+    View mStartButton;
+
+    @InjectView(R.id.bw__counter_cancel_btn)
+    View mCancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,28 +38,44 @@ public class TaskActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
 
-        String key = CounterTask.class.getCanonicalName();
+        String key = CounterTask.KEY;
         TaskApp.getTaskManager().addListener(key, mListener);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        TaskApp.getTaskManager().removeListener(CounterTask.KEY, mListener);
+    }
+
     public void initListeners() {
-        mStartBtn.setOnClickListener(new View.OnClickListener() {
+        mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startTask();
+            }
+        });
+
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelTask();
             }
         });
     }
 
     private void startTask() {
         CounterTask task = new CounterTask();
-
         TaskApp.getTaskManager().execute(task, null);
+    }
+
+    private void  cancelTask() {
+        TaskApp.getTaskManager().cancel(CounterTask.KEY);
     }
 
     private TaskListener<Integer, String, Integer> mListener = new TaskListener<Integer, String, Integer>() {
         @Override
-        public void onSuccess(final Integer result, Task<Integer, String, Integer> task) {
+        public void onFinish(final Integer result, Task<Integer, String, Integer> task) {
             // todo implement
             runOnUiThread(new Runnable() {
                 @Override
@@ -81,15 +100,21 @@ public class TaskActivity extends FragmentActivity {
     };
 
     private static class CounterTask extends Task<Integer, String, Integer> {
+        static final String KEY = "Key";
+
         @Override
         public String getKey() {
-            return getClass().getCanonicalName();
+            return KEY;
         }
 
         @Override
         protected Integer execute() {
             int result = 0;
             for (int i = 0; i < MAX; i++) {
+                if (isCancelled()) {
+                    return i;
+                }
+
                 publishProgress(i);
                 result = i;
                 try {
