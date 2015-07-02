@@ -1,9 +1,9 @@
 package blak.temp.backgroundwork.task;
 
-import blak.temp.backgroundwork.TaskApp;
-
-public abstract class Task<R, K, P> implements Runnable {
+public abstract class Task<Result, Key, Progress> implements Runnable {
     private boolean mCancelled;
+
+    private TaskManager<Key> mTaskManager;
 
     public void cancel() {
         mCancelled = true;
@@ -15,19 +15,19 @@ public abstract class Task<R, K, P> implements Runnable {
 
     @Override
     public void run() {
-        R result = execute();
+        Result result = execute();
 
-        getTaskManager().oTaskFinished(this, result);
+        mTaskManager.oTaskFinished(this, result);
     }
 
-    protected void publishProgress(P progress) {
-        getTaskManager().publishProgress(this, progress);
+    protected void publishProgress(Progress progress) {
+        mTaskManager.publishProgress(this, progress);
     }
 
-    private TaskManager getTaskManager() {
-        return TaskApp.getTaskManager();
+    public void setTaskManager(TaskManager<Key> taskManager) {
+        mTaskManager = taskManager;
     }
 
-    public abstract K getKey();
-    protected abstract R execute();
+    public abstract Key getKey();
+    protected abstract Result execute();
 }

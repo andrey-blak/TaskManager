@@ -1,6 +1,6 @@
 package blak.temp.backgroundwork.task;
 
-public interface TaskListener<R, K, P> {
-    void onFinish(R result, Task<R, K, P> task);
-    void onProgress(P progress, Task<R, K, P> task);
+public interface TaskListener<Result, Key, Progress> {
+    void onFinish(Result result, Task<Result, Key, Progress> task);
+    void onProgress(Progress progress, Task<Result, Key, Progress> task);
 }

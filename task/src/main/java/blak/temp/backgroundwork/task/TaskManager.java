@@ -10,74 +10,75 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class TaskManager<K> {
-    private final ListMultimap<K, WeakReference<TaskListener>> mKeyListenerMap = LinkedListMultimap.create();
-    private final ListMultimap<K, Task<?, K, ?>> mTasksMap = LinkedListMultimap.create();
+public class TaskManager<Key> {
+    private final ListMultimap<Key, WeakReference<TaskListener>> mKeyListenerMap = LinkedListMultimap.create();
+    private final ListMultimap<Key, Task<?, Key, ?>> mTasksMap = LinkedListMultimap.create();
 
     private final Executor mExecutor = AsyncTask.THREAD_POOL_EXECUTOR;
 
-    public <R, P> void execute(Task<R, K, P> task, TaskListener<R, K, P> listener) {
-        K key = task.getKey();
+    public <Result, Progress> void execute(Task<Result, Key, Progress> task, TaskListener<Result, Key, Progress> listener) {
+        Key key = task.getKey();
         if (listener != null) {
             mKeyListenerMap.put(key, new WeakReference(listener));
         }
 
         mTasksMap.put(key, task);
+        task.setTaskManager(this);
         mExecutor.execute(task);
     }
 
-    public <R, P> void addListener(K key, TaskListener<R, K, P> listener) {
+    public <Result, Progress> void addListener(Key key, TaskListener<Result, Key, Progress> listener) {
         if (listener == null) {
             return;
         }
         mKeyListenerMap.put(key, new WeakReference<TaskListener>(listener));
     }
 
-    public void cancel(K key) {
-        List<Task<?, K, ?>> tasks = mTasksMap.get(key);
-        for (Task<?, K, ?> task : tasks) {
+    public void cancel(Key key) {
+        List<Task<?, Key, ?>> tasks = mTasksMap.get(key);
+        for (Task<?, Key, ?> task : tasks) {
             task.cancel();
         }
     }
 
-    public <R, P> void removeListener(K key, TaskListener<R, K, P> listener) {
-        EqualableWeakReference<TaskListener<R, K, P>> reference = new EqualableWeakReference<>(listener);
+    public <Result, Progress> void removeListener(Key key, TaskListener<Result, Key, Progress> listener) {
+        EqualableWeakReference<TaskListener<Result, Key, Progress>> reference = new EqualableWeakReference<>(listener);
         mKeyListenerMap.remove(key, reference);
     }
 
-    public <R, P> void publishProgress(Task<R, K, P> task, P progress) {
+    public <Result, P> void publishProgress(Task<Result, Key, P> task, P progress) {
         List<WeakReference<TaskListener>> classListeners = getClassListeners(task);
         notifyProgressListeners(classListeners, progress, task);
     }
 
-    public <R, P> void oTaskFinished(Task<R, K, P> task, R result) {
-        K key = task.getKey();
+    public <Result, Progress> void oTaskFinished(Task<Result, Key, Progress> task, Result result) {
+        Key key = task.getKey();
         mTasksMap.remove(key, task);
 
         List<WeakReference<TaskListener>> classListeners = getClassListeners(task);
         notifyListeners(classListeners, result, task);
     }
 
-    private <R, P> List<WeakReference<TaskListener>> getClassListeners(Task<R, K, P> task) {
-        K key = task.getKey();
+    private <Result, Progress> List<WeakReference<TaskListener>> getClassListeners(Task<Result, Key, Progress> task) {
+        Key key = task.getKey();
         return mKeyListenerMap.get(key);
     }
 
-    private static <R, K, P> void notifyListeners(Iterable<WeakReference<TaskListener>> listeners, R result, Task<R, K, P> task) {
+    private static <Result, Key, Progress> void notifyListeners(Iterable<WeakReference<TaskListener>> listeners, Result result, Task<Result, Key, Progress> task) {
         for (WeakReference<TaskListener> weakListener : listeners) {
-            TaskListener<R, K, P> listener = weakListener.get();
+            TaskListener<Result, Key, Progress> listener = weakListener.get();
             notifyListener(listener, result, task);
         }
     }
 
-    private static <R, K, P> void notifyProgressListeners(Iterable<WeakReference<TaskListener>> listeners, P progress, Task<R, K, P> task) {
+    private static <Result, Key, Progress> void notifyProgressListeners(Iterable<WeakReference<TaskListener>> listeners, Progress progress, Task<Result, Key, Progress> task) {
         for (WeakReference<TaskListener> weakListener : listeners) {
-            TaskListener<R, K, P> listener = weakListener.get();
+            TaskListener<Result, Key, Progress> listener = weakListener.get();
             notifyProgressListener(listener, progress, task);
         }
     }
 
-    private static <R, K, P> void notifyListener(TaskListener<R, K, P> listener, R result, Task<R, K, P> task) {
+    private static <Result, Key, Progress> void notifyListener(TaskListener<Result, Key, Progress> listener, Result result, Task<Result, Key, Progress> task) {
         if (listener == null) {
             return;
         }
@@ -85,7 +86,7 @@ public class TaskManager<K> {
         listener.onFinish(result, task);
     }
 
-    private static <R, K, P> void notifyProgressListener(TaskListener<R, K, P> listener, P progress, Task<R, K, P> task) {
+    private static <Result, Key, Progress> void notifyProgressListener(TaskListener<Result, Key, Progress> listener, Progress progress, Task<Result, Key, Progress> task) {
         if (listener == null) {
             return;
         }
