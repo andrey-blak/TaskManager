@@ -108,11 +108,11 @@ public class TaskActivity extends FragmentActivity {
         }
 
         @Override
-        protected Integer execute() {
+        public void run() {
             int result = 0;
             for (int i = 0; i < MAX; i++) {
                 if (isCancelled()) {
-                    return i;
+                    return;
                 }
 
                 publishProgress(i);
@@ -123,7 +123,7 @@ public class TaskActivity extends FragmentActivity {
                     e.printStackTrace();
                 }
             }
-            return result;
+            onFinish(result);
         }
     }
 }

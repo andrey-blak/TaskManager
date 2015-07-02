@@ -54,7 +54,10 @@ public class TaskManager<Key> {
     public <Result, Progress> void oTaskFinished(Task<Result, Key, Progress> task, Result result) {
         Key key = task.getKey();
         mTasksMap.remove(key, task);
-
+        if (task.isCancelled()) {
+            return;
+        }
+        
         List<WeakReference<TaskListener>> classListeners = getClassListeners(task);
         notifyListeners(classListeners, result, task);
     }

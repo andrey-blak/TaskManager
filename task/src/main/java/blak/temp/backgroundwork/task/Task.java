@@ -13,13 +13,6 @@ public abstract class Task<Result, Key, Progress> implements Runnable {
         return mCancelled;
     }
 
-    @Override
-    public void run() {
-        Result result = execute();
-
-        mTaskManager.oTaskFinished(this, result);
-    }
-
     protected void publishProgress(Progress progress) {
         mTaskManager.publishProgress(this, progress);
     }
@@ -28,6 +21,13 @@ public abstract class Task<Result, Key, Progress> implements Runnable {
         mTaskManager = taskManager;
     }
 
+    public TaskManager<Key> getTaskManager() {
+        return mTaskManager;
+    }
+
+    protected void onFinish(Result result) {
+        mTaskManager.oTaskFinished(this, result);
+    }
+
     public abstract Key getKey();
-    protected abstract Result execute();
 }
