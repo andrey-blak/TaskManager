@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "blak.temp.backgroundwork"
+        minSdkVersion 14
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile ('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree (dir: 'libs', include: ['*.jar'])
+
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-annotations:22.2.0'
+    compile 'com.jakewharton:butterknife:6.0.0'
+
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    compile 'com.google.guava:guava:18.0'
+
+    compile 'com.octo.android.robospice:robospice:1.4.14'
+}
