@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 public class SpiceCounterActivity extends SpiceActivity {
-    @InjectView(R.id.bw__counter_counter)
+    @InjectView(R.id.bw__key_counter)
     TextView mResultTextView;
 
     @InjectView(R.id.bw__counter_start_btn)

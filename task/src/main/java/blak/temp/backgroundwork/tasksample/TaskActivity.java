@@ -12,18 +12,39 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
+
 public class TaskActivity extends FragmentActivity {
     private static final int MAX = 6;
     private static final int PERIOD = 1000;
 
-    @InjectView(R.id.bw__counter_counter)
-    TextView mResultTextView;
+    @InjectView(R.id.bw__common_counter)
+    TextView mCommonCounterView;
+
+    @InjectView(R.id.bw__common_weak_counter)
+    TextView mCommonWeakCounterView;
+
+    @InjectView(R.id.bw__class_counter)
+    TextView mClassCounterView;
+
+    @InjectView(R.id.bw__class_weak_counter)
+    TextView mClassWeakCounterView;
+
+    @InjectView(R.id.bw__key_counter)
+    TextView mKeyCounterView;
+
+    @InjectView(R.id.bw__key_weak_counter)
+    TextView mKeyWeakView;
 
     @InjectView(R.id.bw__counter_start_btn)
     View mStartButton;
 
     @InjectView(R.id.bw__counter_cancel_btn)
     View mCancelButton;
+
+    private CounterListener mCommonListener;
+    private CounterListener mClassListener;
+    private CounterListener mKeyListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +53,37 @@ public class TaskActivity extends FragmentActivity {
         ButterKnife.inject(this);
 
         initListeners();
+
+        mCommonListener = new CounterListener(mCommonCounterView);
+        mClassListener = new CounterListener(mClassCounterView);
+        mKeyListener = new CounterListener(mKeyCounterView);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        TaskApp.getTaskManager().addListener(mCommonListener);
+        WeakReference commonListenerReference = new WeakReference(new CounterListener(mCommonWeakCounterView));
+        TaskApp.getTaskManager().addListener(commonListenerReference);
+
+        Class<CounterTask> taskClass = CounterTask.class;
+        TaskApp.getTaskManager().addListener(taskClass, mClassListener);
+        WeakReference classListenerReference = new WeakReference(new CounterListener(mClassWeakCounterView));
+        TaskApp.getTaskManager().addListener(taskClass, classListenerReference);
+
         String key = CounterTask.KEY;
-        TaskApp.getTaskManager().addListener(key, mListener);
+        TaskApp.getTaskManager().addListener(key, mKeyListener);
+        WeakReference keyListenerReference = new WeakReference(new CounterListener(mKeyWeakView));
+        TaskApp.getTaskManager().addListener(key, keyListenerReference);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        TaskApp.getTaskManager().removeListener(CounterTask.KEY, mListener);
+        TaskApp.getTaskManager().removeListener(mCommonListener);
+        TaskApp.getTaskManager().removeListener(CounterTask.class, mClassListener);
+        TaskApp.getTaskManager().removeListener(CounterTask.KEY, mKeyListener);
     }
 
     public void initListeners() {
@@ -66,39 +104,45 @@ public class TaskActivity extends FragmentActivity {
 
     private void startTask() {
         CounterTask task = new CounterTask();
-        TaskApp.getTaskManager().execute(task, null);
+        TaskApp.getTaskManager().execute(task);
     }
 
     private void cancelTask() {
         TaskApp.getTaskManager().cancel(CounterTask.KEY);
     }
 
-    private TaskListener<Integer, String, Integer> mListener = new TaskListener<Integer, String, Integer>() {
+    private void showMessage(final TextView textView, final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textView.setText(text);
+            }
+        });
+    }
+
+    private class CounterListener implements TaskListener<Integer, String, Integer> {
+        private TextView mTextView;
+
+        public CounterListener(TextView textView) {
+            mTextView = textView;
+        }
+
         @Override
         public void onFinish(Integer result, Task<Integer, String, Integer> task) {
             String text = "Finished: " + result;
-            showMessage(text);
+            showMessage(mTextView, text);
         }
 
         @Override
         public void onProgress(Integer progress, Task<Integer, String, Integer> task) {
             String text = String.valueOf(progress);
-            showMessage(text);
+            showMessage(mTextView, text);
         }
 
         @Override
         public void onCanceled(Task<Integer, String, Integer> task) {
-            showMessage("Canceled");
+            showMessage(mTextView, "Canceled");
         }
-    };
-
-    private void showMessage(final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mResultTextView.setText(text);
-            }
-        });
     }
 
     private static class CounterTask extends Task<Integer, String, Integer> {
