@@ -69,35 +69,37 @@ public class TaskActivity extends FragmentActivity {
         TaskApp.getTaskManager().execute(task, null);
     }
 
-    private void  cancelTask() {
+    private void cancelTask() {
         TaskApp.getTaskManager().cancel(CounterTask.KEY);
     }
 
     private TaskListener<Integer, String, Integer> mListener = new TaskListener<Integer, String, Integer>() {
         @Override
-        public void onFinish(final Integer result, Task<Integer, String, Integer> task) {
-            // todo implement
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String text = "Finished: " + result;
-                    mResultTextView.setText(text);
-                }
-            });
+        public void onFinish(Integer result, Task<Integer, String, Integer> task) {
+            String text = "Finished: " + result;
+            showMessage(text);
         }
 
         @Override
-        public void onProgress(final Integer progress, Task<Integer, String, Integer> task) {
-            // todo implement
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String text = String.valueOf(progress);
-                    mResultTextView.setText(text);
-                }
-            });
+        public void onProgress(Integer progress, Task<Integer, String, Integer> task) {
+            String text = String.valueOf(progress);
+            showMessage(text);
+        }
+
+        @Override
+        public void onCanceled(Task<Integer, String, Integer> task) {
+            showMessage("Canceled");
         }
     };
+
+    private void showMessage(final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mResultTextView.setText(text);
+            }
+        });
+    }
 
     private static class CounterTask extends Task<Integer, String, Integer> {
         static final String KEY = "Key";
@@ -108,7 +110,7 @@ public class TaskActivity extends FragmentActivity {
         }
 
         @Override
-        public void run() {
+        protected void execute() {
             int result = 0;
             for (int i = 0; i < MAX; i++) {
                 if (isCancelled()) {
