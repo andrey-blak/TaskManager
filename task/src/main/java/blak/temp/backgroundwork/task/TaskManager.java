@@ -3,16 +3,21 @@ package blak.temp.backgroundwork.task;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
-import android.os.AsyncTask;
-
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class TaskManager<Key> {
     private final ListMultimap<Key, TaskListener> mKeyListenerMap = LinkedListMultimap.create();
     private final ListMultimap<Key, Task<?, Key, ?>> mTasksMap = LinkedListMultimap.create();
 
-    private final Executor mExecutor = AsyncTask.THREAD_POOL_EXECUTOR;
+    private TaskExecutor mExecutor;
+
+    public TaskManager() {
+        mExecutor = new ThreadPoolExecutor();
+    }
+
+    public TaskManager(TaskExecutor executor) {
+        mExecutor = executor;
+    }
 
     public <Result, Progress> void execute(Task<Result, Key, Progress> task) {
         execute(task, null);

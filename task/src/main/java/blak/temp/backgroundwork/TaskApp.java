@@ -7,7 +7,7 @@ import android.app.Application;
 public class TaskApp extends Application {
     private static TaskApp sInstance;
 
-    private TaskManager<String> mTaskManager = new TaskManager<String>();
+    private TaskManager<String> mTaskManager = new TaskManager<>();
 
     @Override
     public void onCreate() {
