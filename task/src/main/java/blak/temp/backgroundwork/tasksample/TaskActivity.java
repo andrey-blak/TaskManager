@@ -64,17 +64,17 @@ public class TaskActivity extends FragmentActivity {
         super.onStart();
 
         TaskApp.getTaskManager().addListener(mCommonListener);
-        WeakReference commonListenerReference = new WeakReference(new CounterListener(mCommonWeakCounterView));
+        WeakReference<CounterListener> commonListenerReference = new WeakReference(new CounterListener(mCommonWeakCounterView));
         TaskApp.getTaskManager().addListener(commonListenerReference);
 
         Class<CounterTask> taskClass = CounterTask.class;
         TaskApp.getTaskManager().addListener(taskClass, mClassListener);
-        WeakReference classListenerReference = new WeakReference(new CounterListener(mClassWeakCounterView));
+        WeakReference<CounterListener> classListenerReference = new WeakReference(new CounterListener(mClassWeakCounterView));
         TaskApp.getTaskManager().addListener(taskClass, classListenerReference);
 
         String key = CounterTask.KEY;
         TaskApp.getTaskManager().addListener(key, mKeyListener);
-        WeakReference keyListenerReference = new WeakReference(new CounterListener(mKeyWeakView));
+        WeakReference<CounterListener> keyListenerReference = new WeakReference(new CounterListener(mKeyWeakView));
         TaskApp.getTaskManager().addListener(key, keyListenerReference);
     }
 
