@@ -10,9 +10,9 @@ public class TaskManager<Key> {
     private final ListMultimap<Key, Task<?, Key, ?>> mTasksMap = LinkedListMultimap.create();
     private TaskExecutor mExecutor;
 
-    private CommonTaskManager<Key> mCommonTaskManager = new CommonTaskManager<>();
-    private ClassTaskManager<Key> mClassTaskManager = new ClassTaskManager<>();
-    private KeyTaskManager<Key> mKeyTaskManager = new KeyTaskManager();
+    private ITaskManager mCommonTaskManager = new CommonTaskManager();
+    private ITaskManager mClassTaskManager = new ClassTaskManager();
+    private ITaskManager<Key, Key> mKeyTaskManager = new KeyTaskManager();
 
     public TaskManager() {
         mExecutor = new ThreadPoolExecutor();
@@ -53,19 +53,19 @@ public class TaskManager<Key> {
 
     // common
     public void addListener(TaskListener listener) {
-        mCommonTaskManager.addListener(listener);
+        mCommonTaskManager.addListener(null, listener);
     }
 
     public void addListener(Reference<? extends TaskListener> reference) {
-        mCommonTaskManager.addListener(reference);
+        mCommonTaskManager.addListener(null, reference);
     }
 
     public void removeListener(TaskListener listener) {
-        mCommonTaskManager.removeListener(listener);
+        mCommonTaskManager.removeListener(null, listener);
     }
 
     public void removeListener(Reference<? extends TaskListener> reference) {
-        mCommonTaskManager.removeListener(reference);
+        mCommonTaskManager.removeListener(null, reference);
     }
 
     // class
