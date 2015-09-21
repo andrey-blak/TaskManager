@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TaskManager<Key> {
     private final ListMultimap<Key, Task<?, Key, ?>> mTasksMap = LinkedListMultimap.create();
-    private TaskExecutor mExecutor;
+    private Executor<Task> mExecutor;
 
     private ITaskManager mCommonTaskManager = new CommonTaskManager();
     private ITaskManager mClassTaskManager = new ClassTaskManager();
@@ -18,7 +18,7 @@ public class TaskManager<Key> {
         mExecutor = new ThreadPoolExecutor();
     }
 
-    public TaskManager(TaskExecutor executor) {
+    public TaskManager(Executor executor) {
         mExecutor = executor;
     }
 

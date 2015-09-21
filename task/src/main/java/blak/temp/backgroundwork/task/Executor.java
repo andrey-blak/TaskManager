@@ -1,5 +1,5 @@
 package blak.temp.backgroundwork.task;
 
-public interface TaskExecutor<T extends Task> {
+public interface Executor<T> {
     void execute(T task);
 }

@@ -11,13 +11,6 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".robospicesample.SpiceCounterActivity"
-                  android:label="Robospice Counter">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-            </intent-filter>
-        </activity>
-
         <activity android:name="blak.temp.backgroundwork.tasksample.TaskActivity"
                   android:label="Task Counter">
             <intent-filter>
@@ -25,10 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <service
-            android:name="com.octo.android.robospice.UncachedSpiceService"
-            android:exported="false"/>
 
     </application>
 
